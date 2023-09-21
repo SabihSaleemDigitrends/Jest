@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "383887340072",
+    "project_id": "jest-6949c",
+    "storage_bucket": "jest-6949c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:383887340072:android:620712d378dce374a1fb1d",
+        "android_client_info": {
+          "package_name": "com.jest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCg0QOuptRuHvMfgbWZhoT_wv82Cyh4kHc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
