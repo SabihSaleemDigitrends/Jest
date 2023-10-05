@@ -15,16 +15,54 @@ import {
   RtcSurfaceView,
   ChannelProfileType,
 } from 'react-native-agora';
-const appId = '50896009e4634da2afbf663860036a49';
-const channelName = 'Video chat';
-const token = '007eJxTYOjiP+UjnpyT9NRU/fCCrl0CJ97rJTPnZrhJnZ/0esr+PzYKDKYGFpZmBgaWqSZmxiYpiUaJaUlpZmbGFkAxY7NEE8so9t8pDYGMDMFLk1kZGSAQxOdiCMtMSc1XSM5ILGFgAACtniAV';
-const uid = 0;
+import database from '@react-native-firebase/database';
 
 const Home = () => {
   const agoraEngineRef = useRef<IRtcEngine>(); // Agora engine instance
   const [isJoined, setIsJoined] = useState(false); // Indicates if the local user has joined the channel
   const [remoteUid, setRemoteUid] = useState(0); // Uid of the remote user
   const [message, setMessage] = useState(''); // Message to the user
+  const [uidFromDatabase, setUidFromDatabase] = useState<number>(0);
+  console.log('uidFromDatabase', uidFromDatabase);
+
+  useEffect(() => {
+    fetchUidFromDatabase();
+  }, []);
+
+  const appId = '50896009e4634da2afbf663860036a49';
+  const channelName = 'Video chat';
+  const token =
+    '007eJxTYNjffVrD0TVrz1bbh0fvsygsVNaTDLD1YE76U8Or0ZemL6XAYGpgYWlmYGCZamJmbJKSaJSYlpRmZmZsARQzNks0sdwkKJzaEMjIwJ1Vy8AIhSA+F0NYZkpqvkJyRmIJAwMA2LMcjw==';
+
+  const fetchUidFromDatabase = () => {
+    try {
+      database()
+        .ref('User')
+        .once('value')
+        .then((snapshot: {val: () => any}) => {
+          const getValue = snapshot.val();
+          console.log('getValue', getValue);
+          let array = [];
+          for (let key in getValue) {
+            const value = {...getValue[key], key};
+            array.push(value);
+          }
+          array.filter(el => {
+            console.log('el?.uid', el?.uid);
+            if (el?.uid !== null) {
+              setUidFromDatabase(el?.uid);
+            } else {
+              console.error('Uid not found in the database');
+            }
+          });
+        })
+        .catch((error: any) => {
+          console.error('Error fetching uid from database:', error);
+        });
+    } catch (error) {
+      console.error('Error fetching uid from database:', error);
+    }
+  };
 
   const getPermission = async () => {
     if (Platform.OS === 'android') {
@@ -85,7 +123,7 @@ const Home = () => {
         ChannelProfileType.ChannelProfileCommunication,
       );
       agoraEngineRef.current?.startPreview();
-      agoraEngineRef.current?.joinChannel(token, channelName, uid, {
+      agoraEngineRef.current?.joinChannel(token, channelName, uidFromDatabase, {
         clientRoleType: ClientRoleType.ClientRoleBroadcaster,
       });
     } catch (e) {
@@ -120,8 +158,11 @@ const Home = () => {
         contentContainerStyle={styles.scrollContainer}>
         {isJoined ? (
           <React.Fragment key={0}>
-            <RtcSurfaceView canvas={{uid: 0}} style={styles.videoView} />
-            <Text>Local user uid: {uid}</Text>
+            <RtcSurfaceView
+              canvas={{uid: uidFromDatabase}}
+              style={styles.videoView}
+            />
+            <Text>Local user uid: {uidFromDatabase}</Text>
           </React.Fragment>
         ) : (
           <Text>Join a channel</Text>

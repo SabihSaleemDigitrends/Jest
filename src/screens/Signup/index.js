@@ -27,14 +27,15 @@ const Signup = ({navigation}) => {
     if (email.toLowerCase() && name && address && contactNo && password) {
       auth()
         .createUserWithEmailAndPassword(email, password)
-        .then(() => {
+        .then((uid) => {
           firebase
             .database()
             .ref('User')
             .push({
+              uid: uid?.user?.uid,
               name,
               password,
-              email,
+              email: email?.toLowerCase(),
               address,
               contactNo,
             })
@@ -45,7 +46,7 @@ const Signup = ({navigation}) => {
             .catch(error => {
               console.log('failed: ' + error.message);
             });
-          this.props.navigation.navigate('Login');
+          navigation.navigate('Login');
         })
         .catch(error => {
           if (error.code === 'auth/email-already-in-use') {
@@ -196,27 +197,8 @@ const Signup = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  image: {
-    flex: 1,
-    resizeMode: 'cover',
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#f98b34',
-  },
-  //container View
-  container: {
-    alignItems: 'center',
-    height: 100,
-  },
-  textHeader: {
-    marginVertical: 20,
-    fontWeight: 'bold',
-    fontSize: 30,
-    color: 'black',
-  },
   //container1 View
   container1: {
-    height: 100,
     marginVertical: 10,
   },
   text: {
@@ -226,7 +208,6 @@ const styles = StyleSheet.create({
   },
   //container2 View
   container2: {
-    height: 260,
     marginVertical: 60,
     width: '95%',
     borderColor: 'black',
